@@ -1,2 +1,2 @@
 # Tiger
-A c++ front-end tiger compiler
+A c++ front-end tiger compiler.
