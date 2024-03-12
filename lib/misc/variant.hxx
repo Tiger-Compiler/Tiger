@@ -43,7 +43,7 @@ namespace misc
     requires ContainsTypeGet<U, T, Ts...>
   variant<T, Ts...>::operator const U&() const
   {
-    return std::get<const U>(*this);
+    return std::get<U>(*this);
   }
 
   template <typename T, typename... Ts>

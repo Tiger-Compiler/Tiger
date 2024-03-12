@@ -1,4 +1,4 @@
-                                                            /* -*- C++ -*- */
+/* -*- C++ -*- */
 // %option defines the parameters with which the reflex will be launched
 %option noyywrap
 // To enable compatibility with bison
@@ -38,6 +38,10 @@
 #include <parse/tiger-driver.hh>
 
   // FIXME: Some code was deleted here (Define YY_USER_ACTION to update locations).
+  #define YY_USER_ACTION                \
+      td.location_.columns(size());  
+  
+
 
 #define TOKEN(Type)                             \
   parser::make_ ## Type(td.location_)
@@ -61,7 +65,8 @@
 
 /* Abbreviations.  */
 int             [0-9]+
-  /* FIXME: Some code was deleted here. */
+eol             (\n\r|\r\n|\r|\n)
+  /* DONE: Some code was deleted here. */
 
 %class{
   // FIXME: Some code was deleted here (Local variables).
@@ -69,13 +74,21 @@ int             [0-9]+
 
 %%
 /* The rules.  */
+{eol}         {
+                td.location_.lines() ;
+              }
 {int}         {
-                int val = 0;
-  // FIXME: Some code was deleted here (Decode, and check the value).
+                int val = std::atoi(text());
+                /* FIXME PERSO :CAS DERREUR A GERER LIMITE MAX
+                if text() != std::string(std::atoi(text()))
+                {
+
+                }
+                */
+  // DONE: Some code was deleted here (Decode, and check the value).
                 return TOKEN_VAL(INT, val);
               }
+
+
   /* FIXME: Some code was deleted here. */
 %%
-
-
-
