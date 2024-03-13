@@ -11,21 +11,13 @@
 
 namespace misc
 {
-  template <typename T, class C> unique<T, C>::unique(const data_type& s) 
+  template <typename T, class C> unique<T, C>::unique(const data_type& s)
   /** \brief Following the Flyweight design pattern, set the attribute to a
        unique reference of value s. You might want to check out std::set methods
        on cppreference.com. */
        // DONE
-  { 
-    auto res = object_set_instance().insert(s);
-    
-    
-    obj_ = &(*(res.first));
-    
-    std::cerr <<  "size unique  : " << object_set_instance().size() << std::endl;
-    std::cerr << "adresse obj :" << obj_ << std::endl;
-
-  }
+    : obj_(&(*(object_set_instance().insert(s).first)))
+  {}
 
   template <typename T, class C>
   typename unique<T, C>::object_set_type& unique<T, C>::object_set_instance()
@@ -34,7 +26,7 @@ namespace misc
     /** \brief Create a persistent instance of a set which would hold each value. */
 
 
-    static auto persist_set =  unique<T,C>::object_set_type();
+    static auto persist_set = unique<T,C>::object_set_type();
     return persist_set;
   }
 

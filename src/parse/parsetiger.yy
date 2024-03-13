@@ -181,6 +181,7 @@ exp:
   INT
    
   // FIXME: Some code was deleted here (More rules).
+| STRING
 
 /*---------------.
 | Declarations.  |
