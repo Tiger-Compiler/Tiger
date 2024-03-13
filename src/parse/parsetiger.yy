@@ -179,6 +179,7 @@ program:
 
 exp:
   INT
+  | "let"
    
   // FIXME: Some code was deleted here (More rules).
 
