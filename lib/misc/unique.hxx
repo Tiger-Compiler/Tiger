@@ -22,9 +22,6 @@ namespace misc
     
     obj_ = &(*(res.first));
     
-    std::cerr <<  "size unique  : " << object_set_instance().size() << std::endl;
-    std::cerr << "adresse obj :" << obj_ << std::endl;
-
   }
 
   template <typename T, class C>
