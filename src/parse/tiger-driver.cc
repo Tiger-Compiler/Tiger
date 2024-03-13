@@ -89,11 +89,11 @@ namespace parse
 
     // DONE: Some code was deleted here (Initialize Lexer and enable scan traces).
     Lexer lexer(*in);
-    scan_trace(true); //TODO: REMOVE!!!!!!!!!!!!!!!!!!
+    //scan_trace(true); //TODO: REMOVE!!!!!!!!!!!!!!!!!!
 
     // DONE: Some code was deleted here (Initialize the parser and enable parse traces).
     parse::parser parser(*this, lexer);
-    parse_trace(true); //TODO: REMOOOOOVE !!!!!!!!!!!!!!!!!!!!
+    //parse_trace(true); //TODO: REMOOOOOVE !!!!!!!!!!!!!!!!!!!!
 
     // DONE: Some code was deleted here (Run the parser).
     parser();
