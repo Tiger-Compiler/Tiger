@@ -9,4 +9,4 @@
 
 const char* program_name = "test-parse";
 
-int main() { ast::Exp* e = parse::parse("a + b"); }
+int main() { ast::Exp* e = parse::parse("\"glm_\\_aln\""); }

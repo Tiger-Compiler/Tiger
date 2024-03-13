@@ -61,34 +61,58 @@
 
 %}
 
-%x SC_COMMENT SC_STRING
+%x SC_COMMENT SC_STRING SC_BACKSLASH
 
 /* Abbreviations.  */
-int             [0-9]+
 eol             (\n\r|\r\n|\r|\n)
+blank           (\t|[ ])+
+int             [0-9]+
+
   /* DONE: Some code was deleted here. */
 
 %class{
   // FIXME: Some code was deleted here (Local variables).
+  std::string current_str = "";
 }
 
 %%
 /* The rules.  */
-{eol}         {
-                td.location_.lines() ;
-              }
+{eol}         td.location_.lines();
+{blank}
 {int}         {
+                // DONE: Some code was deleted here (Decode, and check the value).
                 int val = std::atoi(text());
-                /* FIXME PERSO :CAS DERREUR A GERER LIMITE MAX
-                if text() != std::string(std::atoi(text()))
-                {
 
-                }
-                */
-  // DONE: Some code was deleted here (Decode, and check the value).
+                if (val == -1 && (chr() != '-' || text()[1] != '1' || size() != 2))
+                    throw std::runtime_error("This is not a int");
+                
                 return TOKEN_VAL(INT, val);
               }
+  /* DONE: Some code was deleted here. */
+"\""            start(SC_STRING);
 
 
-  /* FIXME: Some code was deleted here. */
+<SC_STRING> {
+"\""            {
+                    std::string tmp = current_str;
+                    current_str = "";
+                    start(INITIAL);
+                    return TOKEN_VAL(STRING, tmp);
+                }
+
+[\\]            start(SC_BACKSLASH);
+
+.         current_str.append(text());
+}
+
+<SC_BACKSLASH>  {   
+([abfnrtv]|x?[0-9]+)  {
+                        current_str.append("\\");
+                        current_str.append(text());
+                        start(SC_STRING);
+                      }
+
+.                     throw std::runtime_error("err");
+}
+
 %%
