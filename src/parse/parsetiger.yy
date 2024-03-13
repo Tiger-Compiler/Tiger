@@ -18,6 +18,9 @@
 // conflict at runtime. Use %expect and %expect-rr to tell Bison about it.
   // FIXME: Some code was deleted here (Other directives).
 
+%expect 1
+%expect-rr 0
+
 %define parse.error verbose
 %defines
 %debug
@@ -155,6 +158,19 @@
 
   // FIXME: Some code was deleted here (Priorities/associativities).
 
+
+//%precedence "|"
+//%precedence "&"
+
+//%precedence "+" "-"
+//%precedence "*" "/"
+%precedence "do" ":=" "of" "else"
+%left "|"
+%left "&"
+%nonassoc ">=" "<=" "<>" "<" ">" "="
+%left "+" "-"
+%left "*" "/"
+
 // Solving conflicts on:
 // let type foo = bar
 //     type baz = bat
@@ -176,12 +192,84 @@ program:
   chunks
    
 ;
+exps:
+%empty
+|exp exps.aux
+;
+
+exps.aux:
+%empty
+|";" exp exps.aux
+;
 
 exp:
   INT
-   
-  // FIXME: Some code was deleted here (More rules).
+| "nil"
 | STRING
+/*Variables, field, elements of an array.*/
+| typeid "[" exp "]" "of" exp
+| typeid "{" exp.1 "}" // exp1
+/*Variables, field, elements of an array.*/
+| lvalue
+/*function call.*/
+| ID "(" exp3 ")" // exp3
+/*Operations.*/
+| "-" exp
+| exp "+" exp
+| exp "-" exp
+| exp "/" exp
+| exp "=" exp
+| exp "<>" exp
+| exp ">" exp
+| exp "<" exp
+| exp ">=" exp
+| exp "<=" exp
+| exp "&" exp
+| exp "|" exp
+| exp "*" exp
+| "(" exps ")"
+/* Assignment. */
+| lvalue ":=" exp
+/* Control structures. */
+| "if" exp "then" exp elserule
+| "while" exp "do" exp
+| "for" ID ":=" exp "to" exp "do" exp
+| "break"
+| "let" chunks "in" exps "end"
+;
+
+elserule:
+%empty
+| "else" exp
+;
+
+exp.1:
+%empty
+|ID "=" exp exp.2
+;
+
+exp.2:
+%empty
+|"," ID "=" exp exp.2
+;
+
+lvalue:
+ID
+| lvalue "." ID
+| lvalue "[" exp "]"
+;
+
+exp3:
+%empty
+| exp exp3.1
+;
+
+exp3.1:
+%empty
+| "," exp exp3.1
+;
+
+//op : "+" | "-" | "*" | "/" | "=" | "<>" | ">" | "<" | ">=" | "<=" | "&" | "|" ;
 
 /*---------------.
 | Declarations.  |
@@ -200,7 +288,9 @@ chunks:
      which is why we end the recursion with a %empty. */
   %empty                  
 | tychunk   chunks        
-  // FIXME: Some code was deleted here (More rules).
+  // IN PROGRESS: Some code was deleted here (More rules).
+| funchunk
+| vardec
 ;
 
 /*--------------------.
@@ -246,6 +336,17 @@ typeid:
 | NAMETY "(" INT ")"    
 ;
 
+vardec : "var" ID colontypeid ":=" exp;
+
+funchunk:
+"function" ID "(" tyfields ")" colontypeid "=" exp
+| "primitive" ID "(" tyfields ")" colontypeid
+;
+
+colontypeid:
+%empty
+| ":" typeid
+;
 %%
 
 void
