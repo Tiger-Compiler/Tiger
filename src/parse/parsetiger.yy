@@ -16,7 +16,9 @@
 
 // In TC, we expect the GLR to resolve one Shift-Reduce and zero Reduce-Reduce
 // conflict at runtime. Use %expect and %expect-rr to tell Bison about it.
-  // FIXME: Some code was deleted here (Other directives).
+  // DONE: Some code was deleted here (Other directives).
+%expect 1
+%expect-rr 0
 
 %define parse.error verbose
 %defines
@@ -154,6 +156,14 @@
 
 
   // FIXME: Some code was deleted here (Priorities/associativities).
+  %precedence "do" ":=" "of" 
+  %left "|"
+  %left "&"
+  %nonassoc ">=" "<=" "<>" "<"  ">" "="
+  %left "+" "-"
+  %left "*" "/"
+  %right "else" "then"
+  
 
 // Solving conflicts on:
 // let type foo = bar
@@ -163,7 +173,14 @@
 // We want the latter.
 %precedence CHUNKS
 %precedence TYPE
-  // FIXME: Some code was deleted here (Other declarations).
+
+  // DONE: Some code was deleted here (Other declarations).
+
+  
+  
+  
+  
+
 
 %start program
 
@@ -178,10 +195,84 @@ program:
 ;
 
 exp:
-  INT
-  | "let"
-   
-  // FIXME: Some code was deleted here (More rules).
+//Litterals
+  "nil"
+  |INT
+  | STRING
+// array and record
+  | ID "[" exp "]" "of" exp
+  | typeid "{" exp.1 "}"
+  //lvalue
+  |lvalue
+  //function call
+  | ID "(" exp.2 ")"
+
+//operateur
+  | "-" exp
+  | exp "+" exp
+  | exp "-" exp
+  | exp "*" exp
+  | exp "/" exp
+  | exp "|" exp
+  | exp "&" exp
+  | exp ">=" exp
+  | exp "<=" exp
+  | exp "=" exp
+  | exp "<>" exp
+  | exp ">" exp
+  | exp "<" exp
+
+  | "(" exps ")"
+//Assignement
+  | lvalue ":=" exp
+//control structure
+  |"if" exp "then" exp 
+  |"if" exp "then" exp "else" exp
+  | "while" exp "do" exp
+  | "for" ID ":=" exp "to" exp "do" exp
+  | "break"
+  | "let" chunks "in" exps "end"
+;
+
+lvalue:
+  ID
+  // record filed access
+  | lvalue "." ID
+  //array subscript
+  | lvalue "[" exp "]"
+  ;
+
+
+
+exps: 
+  %empty
+  |exp exps.1
+  ;
+exps.1:
+  %empty
+  |";" exp exps.1
+  ;
+  
+
+exp.2:
+  %empty
+  |exp exp.2.1
+  ;
+
+exp.2.1:
+  %empty
+  |"," exp exp.2.1
+  ;
+
+exp.1:
+  %empty
+  |ID "=" exp exp.1.1
+  ;
+
+exp.1.1:
+  %empty
+  |"," ID "=" exp exp.1.1
+  ;
 
 /*---------------.
 | Declarations.  |
@@ -199,9 +290,24 @@ chunks:
         end
      which is why we end the recursion with a %empty. */
   %empty                  
-| tychunk   chunks        
-  // FIXME: Some code was deleted here (More rules).
+| tychunk   chunks 
+| funchunk  chunks
+| varchunk    
+  // DONE: Some code was deleted here (More rules).
 ;
+
+varchunk:
+  "var" ID funchunk.1 ":=" exp ;
+
+funchunk:
+   "function" ID "(" tyfields ")" funchunk.1 "=" exp
+  | "primitive" ID "(" tyfields ")" funchunk.1
+  ;
+funchunk.1:
+  %empty
+  |":" typeid
+  ;
+
 
 /*--------------------.
 | Type Declarations.  |

@@ -37,11 +37,8 @@
 #include <parse/parsetiger.hh>
 #include <parse/tiger-driver.hh>
 
-  // FIXME: Some code was deleted here (Define YY_USER_ACTION to update locations).
-  #define YY_USER_ACTION                \
-      td.location_.columns(size());  
-  
-
+  // DONE: Some code was deleted here (Define YY_USER_ACTION to update locations).
+#define YY_USER_ACTION td.location_.columns(size());  
 
 #define TOKEN(Type)                             \
   parser::make_ ## Type(td.location_)
@@ -67,28 +64,31 @@
 eol             (\n\r|\r\n|\r|\n)
 blank           (\t|[ ])+
 int             [0-9]+
+backslash       ([abfnrtv]|x?[0-9]+)
 
   /* DONE: Some code was deleted here. */
 
 %class{
   // FIXME: Some code was deleted here (Local variables).
-  std::string current_str = "";
+  std::string token_str = "";
 }
 
 %%
 /* The rules.  */
-{eol}         td.location_.lines();
-{blank}
 {int}         {
                 // DONE: Some code was deleted here (Decode, and check the value).
-                int val = std::atoi(text());
+                const char *content = text();
+                int val = std::atoi(content);
 
-                if (val == -1 && (chr() != '-' || text()[1] != '1' || size() != 2))
+                if (val == -1 && !(content[0] == '-' && content[1] == '1' && content[2] == 0))
                     throw std::runtime_error("This is not a int");
                 
                 return TOKEN_VAL(INT, val);
               }
 
+/* DONE: Some code was deleted here. */
+{eol}         td.location_.lines();
+{blank}
 "&"           return TOKEN(AND);
 "array"       return TOKEN(ARRAY);
 ":="          return TOKEN(ASSIGN);
@@ -137,46 +137,35 @@ int             [0-9]+
 "var"         return TOKEN(VAR);
 "while"       return TOKEN(WHILE);
 
-  /* DONE: Some code was deleted here. */
-"\""            start(SC_STRING);
-
-"/*"           start(SC_COMMENT);
-
+"\""          start(SC_STRING);
+"/*"          start(SC_COMMENT);
 
 <SC_STRING> {
-"\""            {
-                    std::string tmp = current_str;
-                    current_str = "";
-                    start(INITIAL);
-                    return TOKEN_VAL(STRING, tmp);
-                }
-
-[\\]            start(SC_BACKSLASH);
-
-<<EOF>>  throw std::runtime_error("expected \", but got EOF");
-
-.         current_str.append(text());
+"\""          {
+                std::string tmp = token_str;
+                token_str = "";
+                start(INITIAL);
+                return TOKEN_VAL(STRING, tmp);
+              }
+[\\]          start(SC_BACKSLASH);
+<<EOF>>       throw std::runtime_error("expected \", but got EOF");
+.             token_str.append(text());
 }
 
 <SC_BACKSLASH>  {   
-([abfnrtv]|x?[0-9]+)  {
-                        current_str.append("\\");
-                        current_str.append(text());
-                        start(SC_STRING);
-                      }
-
-.                     throw std::runtime_error("err");
+(backslash)   {
+                token_str.append("\\");
+                token_str.append(text());
+                start(SC_STRING);
+              }
+.             throw std::runtime_error("err");
 }
 
 <SC_COMMENT>  {
-"*/"    start(INITIAL);
-
-{eol}     td.location_.lines();
-
-"/*"    start(SC_COMMENT);
-
-<<EOF>>  throw std::runtime_error("expected */, but got EOF");
-
+"*/"          start(INITIAL);
+{eol}         td.location_.lines();
+"/*"          start(SC_COMMENT);
+<<EOF>>       throw std::runtime_error("expected */, but got EOF");
 .
 }
 
