@@ -293,6 +293,7 @@ chunks:
 | tychunk   chunks 
 | funchunk  chunks
 | varchunk    
+| "import" STRING
   // DONE: Some code was deleted here (More rules).
 ;
 
@@ -357,7 +358,7 @@ typeid:
 void
 parse::parser::error(const location_type& l, const std::string& m)
 {
-  // FIXME: Some code was deleted here.
+  // DONE: Some code was deleted here.
   td.error_ << misc::error::error_type::parse
             << td.location_
             << ": unexepected token: `"

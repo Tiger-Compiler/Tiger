@@ -64,7 +64,7 @@
 eol             (\n\r|\r\n|\r|\n)
 blank           (\t|[ ])+
 int             [0-9]+
-backslash       ([abfnrtv]|x?[0-9]+)
+backslash       (a|b|f|n|r|t|v|x?[0-9]+)
 invalid_word            [a-zA-Z]+
 
   /* DONE: Some code was deleted here. */
@@ -147,33 +147,7 @@ invalid_word            [a-zA-Z]+
 
 "\""          start(SC_STRING);
 "/*"          start(SC_COMMENT);
-.             {
-                invalid_str.append(text());
-                start(SC_ERROR);
-              }
-
-<SC_ERROR> {
-<<EOF>>       {
-                std::string tmp = invalid_str;
-                invalid_str = "";
-                start(INITIAL);
-                return TOKEN_VAL(ID, tmp);
-              }
-{eol}         {
-                std::string tmp = invalid_str;
-                invalid_str = "";
-                start(INITIAL);
-                return TOKEN_VAL(ID, tmp);
-              }
-{blank}       {
-                std::string tmp = invalid_str;
-                invalid_str = "";
-                start(INITIAL);
-                return TOKEN_VAL(ID, tmp);
-              }
-              
-.             invalid_str.append(text());
-}
+[a-zA-Z][a-zA-Z0-9_]*  return TOKEN_VAL(ID, text());
 
 <SC_STRING> {
 "\""          {
@@ -194,7 +168,7 @@ invalid_word            [a-zA-Z]+
 }
 
 <SC_BACKSLASH>  {   
-(backslash)   {
+{backslash}   {
                 token_str.append("\\");
                 token_str.append(text());
                 start(SC_STRING);
