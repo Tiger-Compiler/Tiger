@@ -358,4 +358,8 @@ void
 parse::parser::error(const location_type& l, const std::string& m)
 {
   // FIXME: Some code was deleted here.
+  td.error_ << misc::error::error_type::parse
+            << td.location_
+            << ": unexepected token: `"
+            << misc::escape(m) << "'\n";
 }

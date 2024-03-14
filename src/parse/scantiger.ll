@@ -58,19 +58,21 @@
 
 %}
 
-%x SC_COMMENT SC_STRING SC_BACKSLASH
+%x SC_COMMENT SC_STRING SC_BACKSLASH SC_ERROR
 
 /* Abbreviations.  */
 eol             (\n\r|\r\n|\r|\n)
 blank           (\t|[ ])+
 int             [0-9]+
 backslash       ([abfnrtv]|x?[0-9]+)
+invalid_word            [a-zA-Z]+
 
   /* DONE: Some code was deleted here. */
 
 %class{
   // FIXME: Some code was deleted here (Local variables).
   std::string token_str = "";
+  std::string invalid_str = "";
 }
 
 %%
@@ -88,8 +90,14 @@ backslash       ([abfnrtv]|x?[0-9]+)
 
 /* DONE: Some code was deleted here. */
 {eol}         td.location_.lines();
-{blank}
-"&"           return TOKEN(AND);
+{blank}       {
+                if (invalid_str.size() > 0)
+                  td.error_ << misc::error::error_type::scan
+                        << td.location_
+                        << ": invalid identifier: `"
+                        << misc::escape(text()) << "'\n";
+              }
+[&]           return TOKEN(AND);
 "array"       return TOKEN(ARRAY);
 ":="          return TOKEN(ASSIGN);
 "break"       return TOKEN(BREAK);
@@ -110,7 +118,7 @@ backslash       ([abfnrtv]|x?[0-9]+)
 ">"           return TOKEN(GT);
 "if"          return TOKEN(IF);
 "import"      return TOKEN(IMPORT);
-"in"          return TOKEN(IN);
+^"in"$          return TOKEN(IN);
 "{"           return TOKEN(LBRACE);
 "["           return TOKEN(LBRACK);
 "<="          return TOKEN(LE);
@@ -139,6 +147,33 @@ backslash       ([abfnrtv]|x?[0-9]+)
 
 "\""          start(SC_STRING);
 "/*"          start(SC_COMMENT);
+.             {
+                invalid_str.append(text());
+                start(SC_ERROR);
+              }
+
+<SC_ERROR> {
+<<EOF>>       {
+                std::string tmp = invalid_str;
+                invalid_str = "";
+                start(INITIAL);
+                return TOKEN_VAL(ID, tmp);
+              }
+{eol}         {
+                std::string tmp = invalid_str;
+                invalid_str = "";
+                start(INITIAL);
+                return TOKEN_VAL(ID, tmp);
+              }
+{blank}       {
+                std::string tmp = invalid_str;
+                invalid_str = "";
+                start(INITIAL);
+                return TOKEN_VAL(ID, tmp);
+              }
+              
+.             invalid_str.append(text());
+}
 
 <SC_STRING> {
 "\""          {
@@ -148,7 +183,13 @@ backslash       ([abfnrtv]|x?[0-9]+)
                 return TOKEN_VAL(STRING, tmp);
               }
 [\\]          start(SC_BACKSLASH);
-<<EOF>>       throw std::runtime_error("expected \", but got EOF");
+<<EOF>>       {
+                td.error_ << misc::error::error_type::scan
+                        << td.location_
+                        << "expected \", but got EOF"
+                        << misc::escape(text()) << "'\n";
+                start(INITIAL);
+              }
 .             token_str.append(text());
 }
 
@@ -158,14 +199,26 @@ backslash       ([abfnrtv]|x?[0-9]+)
                 token_str.append(text());
                 start(SC_STRING);
               }
-.             throw std::runtime_error("err");
+.             {
+                td.error_ << misc::error::error_type::scan
+                        << td.location_
+                        << "invalid \\character in string"
+                        << misc::escape(text()) << "'\n";
+                start(INITIAL);
+              }
 }
 
 <SC_COMMENT>  {
 "*/"          start(INITIAL);
 {eol}         td.location_.lines();
 "/*"          start(SC_COMMENT);
-<<EOF>>       throw std::runtime_error("expected */, but got EOF");
+<<EOF>>       {
+                td.error_ << misc::error::error_type::scan
+                        << td.location_
+                        << "expected */, but got EOF"
+                        << misc::escape(text()) << "'\n";
+                start(INITIAL);
+              }
 .
 }
 

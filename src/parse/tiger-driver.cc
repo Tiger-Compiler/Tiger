@@ -92,11 +92,12 @@ namespace parse
     scan_trace(true);
 
     // DONE: Some code was deleted here (Initialize the parser and enable parse traces).
-    parse::parser parser(*this, lexer);
+    parser parser(*this, lexer);
     parse_trace(true);
 
     // DONE: Some code was deleted here (Run the parser).
-    parser();
+    parser.parse();
+    //parser();
 
     ast_type res = ast_;
     ast_ = static_cast<ast::Exp*>(nullptr);
