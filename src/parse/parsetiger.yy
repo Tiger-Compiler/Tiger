@@ -235,13 +235,18 @@ exp:
   | "break"
   | "let" chunks "in" exps "end"
 // In Progress
-  | "new" ID // or type_id ??
-  | lvalue "." ID extends "{" classfields "}"
+  | "new" typeid // or type_id ??
+  | lvalue "." ID "(" exp.3 ")"
 ;
+
+exp.3:
+  %empty
+  | exp exp.2.1
+  ;
 
 extends:
   %empty
-  | "extends" ID
+  | "extends" typeid
   ;
 //In Progress
 
@@ -392,7 +397,7 @@ classfield.1:
 
 classfield.2:
   %empty
-  | ":" ID
+  | ":" typeid
   ;
 %%
 
