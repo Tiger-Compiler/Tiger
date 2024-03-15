@@ -234,7 +234,16 @@ exp:
   | "for" ID ":=" exp "to" exp "do" exp
   | "break"
   | "let" chunks "in" exps "end"
+// In Progress
+  | "new" ID // or type_id ??
+  | lvalue "." ID extends "{" classfields "}"
 ;
+
+extends:
+  %empty
+  | "extends" ID
+  ;
+//In Progress
 
 lvalue:
   ID
@@ -333,13 +342,15 @@ tychunk:
 ;
 
 tydec:
-  "type" ID "=" ty 
+  "type" ID "=" ty
+  | "class" ID extends "{" classfields "}"
 ;
 
 ty:
   typeid               
 | "{" tyfields "}"     
 | "array" "of" typeid  
+| "class" ID extends "{" classfields "}"
 ;
 
 tyfields:
@@ -364,6 +375,25 @@ typeid:
 | NAMETY "(" INT ")"    
 ;
 
+classfields:
+   %empty
+  | classfield classfields
+  ;
+
+classfield:
+  vardec
+  |classfield.1
+  ;
+
+classfield.1:
+  %empty
+  | "method" ID "(" tyfields ")" classfield.2 "=" exp
+  ;
+
+classfield.2:
+  %empty
+  | ":" ID
+  ;
 %%
 
 void
