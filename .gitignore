@@ -50,3 +50,39 @@ m4/lt~obsolete.m4
 # can automatically generate from config.status script
 # (which is called by configure script))
 Makefile
+
+# Generated files
+parsetiger.cc
+parsetiger.hh
+scantiger.cc
+scantiger.hh
+location.hh
+prelude.cc
+version.cc
+
+# Generated directories
+.libs
+
+# Binary files
+tc
+libtool
+test-*
+
+# Trashfiles
+*.o
+*.lo
+*.log
+*.trs
+*.html
+*.bak
+*.la
+*.h
+*.xml
+*.stamp
+*.output
+*.tab.cc
+*.tab.hh
+
+# Other trash
+
+build-aux/*

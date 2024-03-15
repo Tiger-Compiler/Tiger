@@ -156,7 +156,7 @@
 
 
   // FIXME: Some code was deleted here (Priorities/associativities).
-  %precedence "do" ":=" "of" 
+  %precedence "do" ":=" "of" "class"
   %left "|"
   %left "&"
   %nonassoc ">=" "<=" "<>" "<"  ">" "="
@@ -234,7 +234,17 @@ exp:
   | "for" ID ":=" exp "to" exp "do" exp
   | "break"
   | "let" chunks "in" exps "end"
+// In Progress
+  | "new" typeid // or type_id ??
+  | lvalue "." ID "(" args ")"
 ;
+
+args:
+  %empty
+| exp exp.2.1
+
+
+//In Progress
 
 lvalue:
   ID
@@ -333,13 +343,35 @@ tychunk:
 ;
 
 tydec:
-  "type" ID "=" ty 
+  "type" ID "=" ty
+| "class" ID extends "{" classfields "}"
+;
+
+extends:
+  %empty
+| "extends" typeid
 ;
 
 ty:
   typeid               
 | "{" tyfields "}"     
-| "array" "of" typeid  
+| "array" "of" typeid
+| "class" extends "{" classfields "}"
+;
+
+classfields:
+  %empty
+| classfield classfields
+;
+
+classfield:
+  vardec
+| "method" ID "(" tyfields ")" classfield.1 "=" exp
+;
+
+classfield.1:
+  %empty
+| ":" typeid
 ;
 
 tyfields:
@@ -363,7 +395,6 @@ typeid:
      already parsed nodes when given an input to parse. */
 | NAMETY "(" INT ")"    
 ;
-
 %%
 
 void
