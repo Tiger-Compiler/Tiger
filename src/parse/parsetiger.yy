@@ -173,6 +173,8 @@
 // We want the latter.
 %precedence CHUNKS
 %precedence TYPE
+%precedence PRIMITIVE
+%precedence FUNCTION
 
   // DONE: Some code was deleted here (Other declarations).
 
@@ -292,23 +294,32 @@ chunks:
   %empty                  
 | tychunk   chunks 
 | funchunk  chunks
-| varchunk    
-| "import" STRING
+| varchunk  chunks
+| "import" STRING chunks
   // DONE: Some code was deleted here (More rules).
 ;
 
+funchunk:
+  fundec %prec CHUNKS
+| fundec funchunk
+;
+
+fundec:
+  "function" ID "(" tyfields ")" funchunk.1 "=" exp
+| "primitive" ID "(" tyfields ")" funchunk.1
+;
+
 varchunk:
+  vardec
+;
+
+vardec:
   "var" ID funchunk.1 ":=" exp ;
 
-funchunk:
-   "function" ID "(" tyfields ")" funchunk.1 "=" exp
-  | "primitive" ID "(" tyfields ")" funchunk.1
-  ;
 funchunk.1:
   %empty
-  |":" typeid
-  ;
-
+| ":" typeid
+;
 
 /*--------------------.
 | Type Declarations.  |

@@ -3,9 +3,8 @@
  ** \brief Task module related tasks.
  */
 
-#include <iostream>
-
 #include <common.hh>
+#include <iostream>
 #include <task/task-register.hh>
 #define DEFINE_TASKS 1
 #include <task/tasks.hh>
@@ -14,15 +13,24 @@
 // Task module related tasks' implementation.
 namespace task::tasks
 {
-  void tasks_list() { TaskRegister::instance().print_task_list(std::cout); }
+    void tasks_list()
+    {
+        TaskRegister::instance().print_task_list(std::cout);
+    }
 
-  void tasks_graph() { TaskRegister::instance().print_task_graph(std::cout); }
+    void tasks_graph()
+    {
+        TaskRegister::instance().print_task_graph(std::cout);
+    }
 
-  void tasks_selection()
-  {
-    TaskRegister::instance().print_task_order(std::cout);
-  }
+    void tasks_selection()
+    {
+        TaskRegister::instance().print_task_order(std::cout);
+    }
 
-  void time_report() { task_timer.dump_on_destruction(std::cerr); }
+    void time_report()
+    {
+        task_timer.dump_on_destruction(std::cerr);
+    }
 
 } // namespace task::tasks

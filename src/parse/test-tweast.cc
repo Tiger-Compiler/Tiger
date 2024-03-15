@@ -13,13 +13,13 @@ const char* program_name = "test-tweast";
 
 int main()
 {
-  try
+    try
     {
-      parse::Tweast in;
+        parse::Tweast in;
     }
-  catch (const misc::error& e)
+    catch (const misc::error& e)
     {
-      std::cerr << e;
-      exit(e.status_get_value());
+        std::cerr << e;
+        exit(e.status_get_value());
     }
 }

@@ -7,36 +7,40 @@
 
 namespace misc
 {
-  /*------------------.
-  | const selectors.  |
-  `------------------*/
+    /*------------------.
+    | const selectors.  |
+    `------------------*/
 
-  /// Return \a T constified.
-  template <typename T> struct constify_traits
-  {
-    using type = const T;
-  };
+    /// Return \a T constified.
+    template <typename T>
+    struct constify_traits
+    {
+        using type = const T;
+    };
 
-  /// Return \a T as is.
-  template <typename T> struct id_traits
-  {
-    using type = T;
-  };
+    /// Return \a T as is.
+    template <typename T>
+    struct id_traits
+    {
+        using type = T;
+    };
 
-  /*------------------.
-  | select_iterator.  |
-  `------------------*/
+    /*------------------.
+    | select_iterator.  |
+    `------------------*/
 
-  /// The iterator over a non const structure is plain iterator.
-  template <typename T> struct select_iterator
-  {
-    using type = typename T::iterator;
-  };
+    /// The iterator over a non const structure is plain iterator.
+    template <typename T>
+    struct select_iterator
+    {
+        using type = typename T::iterator;
+    };
 
-  /// The iterator over a const structure is a const_iterator.
-  template <typename T> struct select_iterator<const T>
-  {
-    using type = typename T::const_iterator;
-  };
+    /// The iterator over a const structure is a const_iterator.
+    template <typename T>
+    struct select_iterator<const T>
+    {
+        using type = typename T::const_iterator;
+    };
 
-} //namespace misc
+} // namespace misc

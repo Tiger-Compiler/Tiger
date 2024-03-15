@@ -6,35 +6,39 @@
 #pragma once
 
 #include <iosfwd>
-
 #include <misc/ref.hh>
 
 namespace misc
 {
-  enum deref_e
-  {
-    deref
-  };
+    enum deref_e
+    {
+        deref
+    };
 
-  class Deref
-  {
-  protected:
-    Deref(std::ostream&);
+    class Deref
+    {
+    protected:
+        Deref(std::ostream&);
 
-  public:
-    template <typename T> std::ostream& operator<<(const T* t) const;
-    template <typename T> std::ostream& operator<<(T* t) const;
-    template <typename T> std::ostream& operator<<(const ref<T>& t) const;
-    template <typename T> std::ostream& operator<<(const T& t) const;
-    template <typename T> std::ostream& operator<<(T& t) const;
+    public:
+        template <typename T>
+        std::ostream& operator<<(const T* t) const;
+        template <typename T>
+        std::ostream& operator<<(T* t) const;
+        template <typename T>
+        std::ostream& operator<<(const ref<T>& t) const;
+        template <typename T>
+        std::ostream& operator<<(const T& t) const;
+        template <typename T>
+        std::ostream& operator<<(T& t) const;
 
-  protected:
-    friend Deref operator<<(std::ostream&, deref_e);
+    protected:
+        friend Deref operator<<(std::ostream&, deref_e);
 
-    std::ostream& ostr_;
-  };
+        std::ostream& ostr_;
+    };
 
-  Deref operator<<(std::ostream& ostr, deref_e);
+    Deref operator<<(std::ostream& ostr, deref_e);
 
 } // namespace misc
 

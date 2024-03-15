@@ -2,8 +2,8 @@
  ** Testing the symbol tables.
  */
 
+#include <misc/contract.hh>
 #include <ostream>
 
-#include <misc/contract.hh>
-
-int main() {}
+int main()
+{}

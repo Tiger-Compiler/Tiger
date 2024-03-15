@@ -118,7 +118,7 @@ invalid_word            [a-zA-Z]+
 ">"           return TOKEN(GT);
 "if"          return TOKEN(IF);
 "import"      return TOKEN(IMPORT);
-^"in"$          return TOKEN(IN);
+"in"          return TOKEN(IN);
 "{"           return TOKEN(LBRACE);
 "["           return TOKEN(LBRACK);
 "<="          return TOKEN(LE);

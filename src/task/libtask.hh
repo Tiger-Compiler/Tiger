@@ -48,60 +48,61 @@ namespace task
 #if DEFINE_TASKS
 
 /// Define the current Task group name.
-#  define TASK_GROUP(Name) const char group_name[] = Name
+#    define TASK_GROUP(Name) const char group_name[] = Name
 
 /// Instantiate a FunctionTask.
-#  define TASK_DECLARE(Name, Help, Routine, Deps)                              \
-    extern void(Routine)();                                                    \
-    static task::FunctionTask task_##Routine(Routine, group_name, Help, Name,  \
-                                             Deps)
+#    define TASK_DECLARE(Name, Help, Routine, Deps)                            \
+        extern void(Routine)();                                                \
+        static task::FunctionTask task_##Routine(Routine, group_name, Help,    \
+                                                 Name, Deps)
 
 /// Instantiate a BooleanTask.
-#  define BOOLEAN_TASK_DECLARE(Name, Help, Flag, Deps)                         \
-    bool Flag;                                                                 \
-    static task::BooleanTask task_##Flag(Flag, group_name, Help, Name, Deps)
+#    define BOOLEAN_TASK_DECLARE(Name, Help, Flag, Deps)                       \
+        bool Flag;                                                             \
+        static task::BooleanTask task_##Flag(Flag, group_name, Help, Name, Deps)
 
-#  define TASK_UNIQUE_NAME_(Line) task_##Line
+#    define TASK_UNIQUE_NAME_(Line) task_##Line
 
-#  define TASK_UNIQUE_NAME TASK_UNIQUE_NAME_(__LINE__)
+#    define TASK_UNIQUE_NAME TASK_UNIQUE_NAME_(__LINE__)
 
 /// Instantiate an IntTask.
-#  define INT_TASK_DECLARE(Name, Min, Max, Help, Flag, Deps)                   \
-    static task::IntTask TASK_UNIQUE()(Flag, Min, Max, group_name, Help, Name, \
-                                       Deps)
+#    define INT_TASK_DECLARE(Name, Min, Max, Help, Flag, Deps)                 \
+        static task::IntTask TASK_UNIQUE()(Flag, Min, Max, group_name, Help,   \
+                                           Name, Deps)
 
 /// Instantiate a StringTask.
-#  define STRING_TASK_DECLARE(Name, Default, Help, Flag, Deps)                 \
-    std::string Flag = Default;                                                \
-    static task::StringTask task_##Flag(Flag, group_name, Help, Name, Deps)
+#    define STRING_TASK_DECLARE(Name, Default, Help, Flag, Deps)               \
+        std::string Flag = Default;                                            \
+        static task::StringTask task_##Flag(Flag, group_name, Help, Name, Deps)
 
 /// Instanciate a MultipleStringTask
-#  define MULTIPLE_STRING_TASK_DECLARE(Name, Help, Routine, Deps)              \
-    extern task::MultipleStringTask::callback_type Routine;                    \
-    static task::MultipleStringTask task_##Routine(Routine, group_name, Help,  \
-                                                   Name, Deps)
+#    define MULTIPLE_STRING_TASK_DECLARE(Name, Help, Routine, Deps)            \
+        extern task::MultipleStringTask::callback_type Routine;                \
+        static task::MultipleStringTask task_##Routine(Routine, group_name,    \
+                                                       Help, Name, Deps)
 
 /// Instantiate a DisjunctiveTask.
-#  define DISJUNCTIVE_TASK_DECLARE(Name, Help, Deps)                           \
-    static task::DisjunctiveTask task_##Routine(group_name, Help, Name, Deps)
+#    define DISJUNCTIVE_TASK_DECLARE(Name, Help, Deps)                         \
+        static task::DisjunctiveTask task_##Routine(group_name, Help, Name,    \
+                                                    Deps)
 
 #else // !DEFINE_TASKS
 
 /// Define the current Task group name.
-#  define TASK_GROUP(Name) extern const char* group_name
+#    define TASK_GROUP(Name) extern const char* group_name
 /// Instantiate a FunctionTask.
-#  define TASK_DECLARE(Name, Help, Routine, Deps) extern void(Routine)()
+#    define TASK_DECLARE(Name, Help, Routine, Deps) extern void(Routine)()
 /// Instantiate a BooleanTask.
-#  define BOOLEAN_TASK_DECLARE(Name, Help, Flag, Deps) extern bool Flag;
+#    define BOOLEAN_TASK_DECLARE(Name, Help, Flag, Deps) extern bool Flag;
 /// Instantiate an IntTask.
-#  define INT_TASK_DECLARE(Name, Min, Max, Help, Flag, Deps)
+#    define INT_TASK_DECLARE(Name, Min, Max, Help, Flag, Deps)
 /// Instantiate a StringTask.
-#  define STRING_TASK_DECLARE(Name, Default, Help, Flag, Deps)                 \
-    extern std::string Flag;
+#    define STRING_TASK_DECLARE(Name, Default, Help, Flag, Deps)               \
+        extern std::string Flag;
 /// Instantiate a MultipleStringTask.
-#  define MULTIPLE_STRING_TASK_DECLARE(Name, Help, Routine, Deps)              \
-    extern void(Routine)(std::string);
+#    define MULTIPLE_STRING_TASK_DECLARE(Name, Help, Routine, Deps)            \
+        extern void(Routine)(std::string);
 /// Instantiate a DisjunctiveTask.
-#  define DISJUNCTIVE_TASK_DECLARE(Name, Help, Deps)
+#    define DISJUNCTIVE_TASK_DECLARE(Name, Help, Deps)
 
 #endif // !DEFINE_TASKS

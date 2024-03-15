@@ -7,8 +7,8 @@
 
 namespace misc
 {
-  Deref::Deref(std::ostream& o)
-    : ostr_(o)
-  {}
+    Deref::Deref(std::ostream& o)
+        : ostr_(o)
+    {}
 
 } // namespace misc

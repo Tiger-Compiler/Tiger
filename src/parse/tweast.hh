@@ -14,10 +14,10 @@
 // as this module is available (i.e., at TC-2).
 namespace ast
 {
-  class Exp;
-  class Var;
-  class NameTy;
-  class ChunkList;
+    class Exp;
+    class Var;
+    class NameTy;
+    class ChunkList;
 
 } // namespace ast
 #include <misc/map.hh>
@@ -26,53 +26,56 @@ namespace ast
 
 namespace parse
 {
-  /// \brief TWEAST stands for ``Text With Embedded Abstract Syntax Trees''.
-  ///
-  /// Aggregate string to parse and tables of metavariables.
-  class Tweast
-    : public MetavarMap<ast::Exp>
-    , public MetavarMap<ast::Var>
-    , public MetavarMap<ast::NameTy>
-    , public MetavarMap<ast::ChunkList>
-  {
-  public:
-    Tweast();
-    Tweast(const std::string& str);
-
-    /// \brief Stream manipulator.
+    /// \brief TWEAST stands for ``Text With Embedded Abstract Syntax Trees''.
     ///
-    /// Append Tiger expressions to the string to parse.
-    template <typename T> Tweast& operator<<(const T& t);
+    /// Aggregate string to parse and tables of metavariables.
+    class Tweast
+        : public MetavarMap<ast::Exp>
+        , public MetavarMap<ast::Var>
+        , public MetavarMap<ast::NameTy>
+        , public MetavarMap<ast::ChunkList>
+    {
+    public:
+        Tweast();
+        Tweast(const std::string& str);
 
-    /// Metavariables manipulator.
-    template <typename T> T* take(unsigned s);
+        /// \brief Stream manipulator.
+        ///
+        /// Append Tiger expressions to the string to parse.
+        template <typename T>
+        Tweast& operator<<(const T& t);
 
-    /// Get the current input string.
-    std::string input_get() const;
+        /// Metavariables manipulator.
+        template <typename T>
+        T* take(unsigned s);
 
-    /// Print the table
-    std::ostream& dump(std::ostream& ostr) const;
+        /// Get the current input string.
+        std::string input_get() const;
 
-  protected:
-    // Insert base class members in the current scope.
-    using MetavarMap<ast::Exp>::append_;
-    using MetavarMap<ast::Var>::append_;
-    using MetavarMap<ast::NameTy>::append_;
-    using MetavarMap<ast::ChunkList>::append_;
+        /// Print the table
+        std::ostream& dump(std::ostream& ostr) const;
 
-    /// Fake append (default case, i.e. when \a data is not a metavariable).
-    template <typename T> T& append_(unsigned&, T& data) const;
+    protected:
+        // Insert base class members in the current scope.
+        using MetavarMap<ast::Exp>::append_;
+        using MetavarMap<ast::Var>::append_;
+        using MetavarMap<ast::NameTy>::append_;
+        using MetavarMap<ast::ChunkList>::append_;
 
-  protected:
-    /// The next identifier suffix to create.
-    static unsigned count_;
+        /// Fake append (default case, i.e. when \a data is not a metavariable).
+        template <typename T>
+        T& append_(unsigned&, T& data) const;
 
-    /// The string to parse.
-    std::stringstream input_;
-  };
+    protected:
+        /// The next identifier suffix to create.
+        static unsigned count_;
 
-  /// Display the content of the tweast.
-  std::ostream& operator<<(std::ostream& ostr, const Tweast& in);
+        /// The string to parse.
+        std::stringstream input_;
+    };
+
+    /// Display the content of the tweast.
+    std::ostream& operator<<(std::ostream& ostr, const Tweast& in);
 
 } // namespace parse
 

@@ -11,6 +11,7 @@
 
 namespace object::tasks
 {
-  void object_parse() {}
+    void object_parse()
+    {}
 
 } // namespace object::tasks
