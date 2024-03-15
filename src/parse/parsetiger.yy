@@ -156,7 +156,7 @@
 
 
   // FIXME: Some code was deleted here (Priorities/associativities).
-  %precedence "do" ":=" "of" 
+  %precedence "do" ":=" "of" "class" "method"
   %left "|"
   %left "&"
   %nonassoc ">=" "<=" "<>" "<"  ">" "="
@@ -177,12 +177,6 @@
 %precedence FUNCTION
 
   // DONE: Some code was deleted here (Other declarations).
-
-  
-  
-  
-  
-
 
 %start program
 
@@ -355,7 +349,7 @@ ty:
   typeid               
 | "{" tyfields "}"     
 | "array" "of" typeid  
-| "class" ID extends "{" classfields "}"
+| "class" extends "{" classfields "}"
 ;
 
 tyfields:
@@ -387,12 +381,7 @@ classfields:
 
 classfield:
   vardec
-  |classfield.1
-  ;
-
-classfield.1:
-  %empty
-  | "method" ID "(" tyfields ")" classfield.2 "=" exp
+  |"method" ID "(" tyfields ")" classfield.2 "=" exp
   ;
 
 classfield.2:
