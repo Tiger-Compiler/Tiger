@@ -7,17 +7,15 @@
 
 namespace task
 {
-    MultipleStringTask::MultipleStringTask(callback_type& cb,
-                                           const char* module_name,
-                                           const char* desc, const char* name,
-                                           std::string deps)
-        : ArgumentTask(name, module_name, desc, "DIR", deps)
-        , execute_(cb)
-    {}
+  MultipleStringTask::MultipleStringTask(callback_type& cb,
+                                         const char* module_name,
+                                         const char* desc,
+                                         const char* name,
+                                         std::string deps)
+    : ArgumentTask(name, module_name, desc, "DIR", deps)
+    , execute_(cb)
+  {}
 
-    void MultipleStringTask::execute() const
-    {
-        execute_(arg_get());
-    }
+  void MultipleStringTask::execute() const { execute_(arg_get()); }
 
-} // namespace task
+} //namespace task

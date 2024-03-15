@@ -10,9 +10,6 @@
 
 namespace task
 {
-    inline const misc::timer& TaskRegister::timer_get() const
-    {
-        return timer_;
-    }
+  inline const misc::timer& TaskRegister::timer_get() const { return timer_; }
 
 } // namespace task.

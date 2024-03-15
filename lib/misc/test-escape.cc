@@ -3,17 +3,18 @@
  */
 
 #include <iostream>
+#include <sstream>
+
 #include <misc/contract.hh>
 #include <misc/escape.hh>
-#include <sstream>
 
 using misc::escape;
 
 int main()
 {
-    std::ostringstream s;
+  std::ostringstream s;
 
-    s << escape("\a\b\f\n\r\t\v\\\"") << escape('\a');
+  s << escape("\a\b\f\n\r\t\v\\\"") << escape('\a');
 
-    postcondition(s.str() == R"(\007\b\f\n\r\t\v\\\"\007)");
+  postcondition(s.str() == R"(\007\b\f\n\r\t\v\\\"\007)");
 }

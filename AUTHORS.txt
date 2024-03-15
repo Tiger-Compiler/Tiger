@@ -1,4 +1,1 @@
-Matthias-Mehdi Kaddour <matthias-mehdi.kaddour@epita.fr>
-Louis Ledoux <louis.ledoux@epita.fr>
-Yanis Coper <yanis.coper@epita.fr>
-Guillaume-Alain Priso Totto <guillaume-alain.priso-totto@epita.fr>
+FIXME: Who are you?

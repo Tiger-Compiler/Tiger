@@ -7,16 +7,16 @@
 
 namespace task
 {
-    // task.hh
-    class Task;
+  // task.hh
+  class Task;
 
-    // argument-task.hh
-    class ArgumentTask;
+  // argument-task.hh
+  class ArgumentTask;
 
-    // simple-task.hh
-    class SimpleTask;
+  // simple-task.hh
+  class SimpleTask;
 
-    // task-register.hh
-    class TaskRegister;
+  // task-register.hh
+  class TaskRegister;
 
 } // namespace task

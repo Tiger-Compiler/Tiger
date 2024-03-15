@@ -10,29 +10,29 @@
 // From ast/.
 namespace ast
 {
-    class Exp;
-    class ChunkList;
+  class Exp;
+  class ChunkList;
 
 } // namespace ast
 
 namespace parse
 {
-    // From scantiger.hh.
-    class Lexer;
+  // From scantiger.hh.
+  class Lexer;
 
-    // From parsetiger.yy.
-    class parser;
+  // From parsetiger.yy.
+  class parser;
 
-    // From location.hh.
-    class location;
+  // From location.hh.
+  class location;
 
-    // From tiger-driver.hh.
-    class TigerDriver;
+  // From tiger-driver.hh.
+  class TigerDriver;
 
-    // From tweast.hh
-    class Tweast;
+  // From tweast.hh
+  class Tweast;
 
-    /// Result of a parse: an Exp (*.tig) or a ChunkList (*.tih).
-    using ast_type = misc::variant<ast::Exp*, ast::ChunkList*>;
+  /// Result of a parse: an Exp (*.tig) or a ChunkList (*.tih).
+  using ast_type = misc::variant<ast::Exp*, ast::ChunkList*>;
 
 } // namespace parse

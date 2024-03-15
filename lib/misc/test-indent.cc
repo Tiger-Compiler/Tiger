@@ -3,9 +3,10 @@
  */
 
 #include <iostream>
+#include <sstream>
+
 #include <misc/contract.hh>
 #include <misc/indent.hh>
-#include <sstream>
 
 using misc::iendl;
 using misc::incendl;
@@ -13,13 +14,13 @@ using misc::decendl;
 
 int main()
 {
-    std::ostringstream s;
+  std::ostringstream s;
 
-    s << "{" << incendl << "1," << iendl << "2," << iendl << "{" << incendl
-      << "2.1," << iendl << "2.2" << decendl << "}," << iendl << "3" << decendl
-      << "}\n";
+  s << "{" << incendl << "1," << iendl << "2," << iendl << "{" << incendl
+    << "2.1," << iendl << "2.2" << decendl << "}," << iendl << "3" << decendl
+    << "}\n";
 
-    std::string expected = "{\n\
+  std::string expected = "{\n\
   1,\n\
   2,\n\
   {\n\
@@ -29,5 +30,5 @@ int main()
   3\n\
 }\n\
 ";
-    assertion(s.str() == expected);
+  assertion(s.str() == expected);
 }
