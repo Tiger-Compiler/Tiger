@@ -16,7 +16,9 @@
 
 // In TC, we expect the GLR to resolve one Shift-Reduce and zero Reduce-Reduce
 // conflict at runtime. Use %expect and %expect-rr to tell Bison about it.
-  // FIXME: Some code was deleted here (Other directives).
+  // DONE: Some code was deleted here (Other directives).
+%expect 1
+%expect-rr 0
 
 %define parse.error verbose
 %defines
@@ -179,16 +181,26 @@
        WHILE        "while"
        EOF 0        "end of file"
 
-%type <ast::Exp*>             exp
-%type <ast::ChunkList*>       chunks
 
-%type <ast::TypeChunk*>       tychunk
-%type <ast::TypeDec*>         tydec
-%type <ast::NameTy*>          typeid
-%type <ast::Ty*>              ty
+  // FIXME: Some code was deleted here (Priorities/associativities).
+  %precedence "do" ":=" "of" "class"
+  %left "|"
+  %left "&"
+  %nonassoc ">=" "<=" "<>" "<"  ">" "="
+  %left "+" "-"
+  %left "*" "/"
+  %right "else" "then"
+  
+// %type <ast::Exp*>             exp
+// %type <ast::ChunkList*>       chunks
 
-%type <ast::Field*>           tyfield
-%type <ast::fields_type*>     tyfields tyfields.1
+// %type <ast::TypeChunk*>       tychunk
+// %type <ast::TypeDec*>         tydec
+// %type <ast::NameTy*>          typeid
+// %type <ast::Ty*>              ty
+
+// %type <ast::Field*>           tyfield
+// %type <ast::fields_type*>     tyfields tyfields.1
   // FIXME: Some code was deleted here (More %types).
 
   // FIXME: Some code was deleted here (Priorities/associativities).
@@ -201,7 +213,16 @@
 // We want the latter.
 %precedence CHUNKS
 %precedence TYPE
-  // FIXME: Some code was deleted here (Other declarations).
+%precedence PRIMITIVE
+%precedence FUNCTION
+
+  // DONE: Some code was deleted here (Other declarations).
+
+  
+  
+  
+  
+
 
 %start program
 
@@ -209,15 +230,111 @@
 program:
   /* Parsing a source program.  */
   exp
-   { td.ast_ = $1; }
+   
 | /* Parsing an imported file.  */
   chunks
-   { td.ast_ = $1; }
+   
 ;
 
 exp:
-  INT
-   { $$ = make_IntExp(@$, $1); }
+//Litterals
+  "nil"
+  |INT
+  | STRING
+// array and record
+  | ID "[" exp "]" "of" exp
+  | typeid "{" exp.1 "}"
+  //lvalue
+  |lvalue
+  //function call
+  | ID "(" exp.2 ")"
+
+//operateur
+  | "-" exp
+  | exp "+" exp
+  | exp "-" exp
+  | exp "*" exp
+  | exp "/" exp
+  | exp "|" exp
+  | exp "&" exp
+  | exp ">=" exp
+  | exp "<=" exp
+  | exp "=" exp
+  | exp "<>" exp
+  | exp ">" exp
+  | exp "<" exp
+
+  | "(" exps ")"
+//Assignement
+  | lvalue ":=" exp
+//control structure
+  |"if" exp "then" exp 
+  |"if" exp "then" exp "else" exp
+  | "while" exp "do" exp
+  | "for" ID ":=" exp "to" exp "do" exp
+  | "break"
+  | "let" chunks "in" exps "end"
+// In Progress
+  | "new" typeid // or type_id ??
+  | lvalue "." ID "(" args ")"
+;
+
+args:
+  %empty
+| exp exp.2.1
+
+
+//In Progress
+
+lvalue:
+  ID
+  // record filed access
+  | lvalue "." ID
+  //array subscript
+  | lvalue "[" exp "]"
+  ;
+
+
+
+exps: 
+  %empty
+  |exp exps.1
+  ;
+exps.1:
+  %empty
+  |";" exp exps.1
+  ;
+  
+
+exp.2:
+  %empty
+  |exp exp.2.1
+  ;
+
+exp.2.1:
+  %empty
+  |"," exp exp.2.1
+  ;
+
+exp.1:
+  %empty
+  |ID "=" exp exp.1.1
+  ;
+
+exp.1.1:
+  %empty
+  |"," ID "=" exp exp.1.1
+  ;
+
+//    { td.ast_ = $1; }
+// | /* Parsing an imported file.  */
+//   chunks
+//    { td.ast_ = $1; }
+// ;
+
+// exp:
+//   INT
+//    { $$ = make_IntExp(@$, $1); }
   // FIXME: Some code was deleted here (More rules).
 
 /*---------------.
@@ -235,8 +352,36 @@ chunks:
             ..
         end
      which is why we end the recursion with a %empty. */
-  %empty                  { $$ = make_ChunkList(@$); }
-| tychunk   chunks        { $$ = $2; $$->push_front($1); }
+  %empty                  
+| tychunk   chunks 
+| funchunk  chunks
+| varchunk  chunks
+| "import" STRING chunks
+  // DONE: Some code was deleted here (More rules).
+;
+
+funchunk:
+  fundec %prec CHUNKS
+| fundec funchunk
+;
+
+fundec:
+  "function" ID "(" tyfields ")" funchunk.1 "=" exp
+| "primitive" ID "(" tyfields ")" funchunk.1
+;
+
+varchunk:
+  vardec
+;
+
+vardec:
+  "var" ID funchunk.1 ":=" exp ;
+
+funchunk.1:
+  %empty
+| ":" typeid
+//   %empty                  { $$ = make_ChunkList(@$); }
+// | tychunk   chunks        { $$ = $2; $$->push_front($1); }
   // FIXME: Some code was deleted here (More rules).
 ;
 
@@ -247,40 +392,88 @@ chunks:
 tychunk:
   /* Use `%prec CHUNKS' to do context-dependent precedence and resolve a
      shift-reduce conflict. */
-  tydec %prec CHUNKS  { $$ = make_TypeChunk(@1); $$->push_front(*$1); }
-| tydec tychunk       { $$ = $2; $$->push_front(*$1); }
+  tydec %prec CHUNKS  
+| tydec tychunk       
 ;
 
 tydec:
-  "type" ID "=" ty { $$ = make_TypeDec(@$, $2, $4); }
+  "type" ID "=" ty
+| "class" ID extends "{" classfields "}"
+;
+
+extends:
+  %empty
+| "extends" typeid
 ;
 
 ty:
-  typeid               { $$ = $1; }
-| "{" tyfields "}"     { $$ = make_RecordTy(@$, $2); }
-| "array" "of" typeid  { $$ = make_ArrayTy(@$, $3); }
+  typeid               
+| "{" tyfields "}"     
+| "array" "of" typeid
+| "class" extends "{" classfields "}"
+;
+
+classfields:
+  %empty
+| classfield classfields
+;
+
+classfield:
+  vardec
+| "method" ID "(" tyfields ")" classfield.1 "=" exp
+;
+
+classfield.1:
+  %empty
+| ":" typeid
 ;
 
 tyfields:
-  %empty               { $$ = make_fields_type(); }
-| tyfields.1           { $$ = $1; }
+  %empty               
+| tyfields.1           
 ;
 
 tyfields.1:
-  tyfields.1 "," tyfield { $$ = $1; $$->emplace_back($3); }
-| tyfield                { $$ = make_fields_type($1); }
+  tyfields.1 "," tyfield 
+| tyfield                
 ;
 
 tyfield:
-  ID ":" typeid     { $$ = make_Field(@$, $1, $3); }
+  ID ":" typeid     
+//   tydec %prec CHUNKS  { $$ = make_TypeChunk(@1); $$->push_front(*$1); }
+// | tydec tychunk       { $$ = $2; $$->push_front(*$1); }
+// ;
+
+// tydec:
+//   "type" ID "=" ty { $$ = make_TypeDec(@$, $2, $4); }
+// ;
+
+// ty:
+//   typeid               { $$ = $1; }
+// | "{" tyfields "}"     { $$ = make_RecordTy(@$, $2); }
+// | "array" "of" typeid  { $$ = make_ArrayTy(@$, $3); }
+// ;
+
+// tyfields:
+//   %empty               { $$ = make_fields_type(); }
+// | tyfields.1           { $$ = $1; }
+// ;
+
+// tyfields.1:
+//   tyfields.1 "," tyfield { $$ = $1; $$->emplace_back($3); }
+// | tyfield                { $$ = make_fields_type($1); }
+// ;
+
+// tyfield:
+//   ID ":" typeid     { $$ = make_Field(@$, $1, $3); }
 ;
 
 %token NAMETY "_namety";
 typeid:
-  ID                    { $$ = make_NameTy(@$, $1); }
+  ID                    //{ $$ = make_NameTy(@$, $1); }
   /* This is a metavariable. It it used internally by TWEASTs to retrieve
      already parsed nodes when given an input to parse. */
-| NAMETY "(" INT ")"    { $$ = metavar<ast::NameTy>(td, $3); }
+| NAMETY "(" INT ")"    //{ $$ = metavar<ast::NameTy>(td, $3); }
 ;
 
 %%
@@ -288,5 +481,9 @@ typeid:
 void
 parse::parser::error(const location_type& l, const std::string& m)
 {
-  // FIXME: Some code was deleted here.
+  // DONE: Some code was deleted here.
+  td.error_ << misc::error::error_type::parse
+            << td.location_
+            << ": unexepected token: `"
+            << misc::escape(m) << "'\n";
 }
